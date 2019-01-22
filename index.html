@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- reset css -->
+    <link rel="stylesheet" href="assets/reset.css">
+    <!-- style css -->
+    <link rel="stylesheet" href="assets/style.css">
+    <!-- javascript -->
+    <!-- <script type="text/javascript" src="assets/game.js"></script> -->
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" />
+
+    <title>Wholesome GIFs!</title>
+</head>
+<body>
+
+    
+    <div class="container">
+        
+        <!-- buttons will appear here -->
+        <div class="buttonContainer">
+        </div>
+        <!-- gifs will go here -->
+        <div id="images"></div>
+
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+// global variables
+var topic;
+var newButton;
+
+var topics = [
+            "puppies",
+            "positive",
+            "baby animals",
+            "inspiration",
+            "art",
+            "bob ross",
+            "happy",
+        ];    
+
+    // Your app should take the topics in this array and create buttons in your HTML:
+    // Try using a loop that appends a button for each string in the array.
+
+    for (let i = 0; i < topics.length; i++){
+            var newButton = $("<button>").append(topics[i]);
+            topics[i] = $(this).attr("data-topic");
+            // var topic = $(newButton).attr("src", topics[i]);
+            $(".buttonContainer").append($(newButton));
+        };
+
+// When the user clicks on a button, the page should grab 10 static, non-animated gif images from the GIPHY API and place them on the page.
+$("button").click(function(){
+
+//   Constructing a URL to search Giphy for the topic of the given button
+    // for now, just displaying puppies gifs
+    var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic + "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10";
+
+    //   Performing our AJAX GET request
+  $.ajax({
+    url: queryURL,
+    method: "GET"
+  })
+
+    // After the data comes back from the API
+    .then(function(response) {
+      // Storing an array of results in the results variable
+      var results = response.data;
+
+      console.log(results);  
+
+    // looping through results 
+    // displaying paused images for each div
+    for (let x = 0; x < results.length; x++){
+
+        // Creating a div for the gif
+        var gifDiv = $("<div>");
+
+
+        // Under every gif, display its rating (PG, G, so on).
+        // Storing the result item's rating
+        var rating = results[x].rating;
+
+        // Creating a paragraph tag with the result item's rating
+        var p = $("<p>").text("Rating: " + rating);
+
+        // Creating an image tag
+        var topicImage = $("<img>");
+
+        // Giving the image tag an src attribute of a proprty pulled off the
+        // result item
+        // this gives each of the topic images the source of the still image
+        $(topicImage).attr("src", results[x].images.fixed_height_still.url);
+
+        // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+        var state = $(this).attr("data-state", "still");
+        console.log(state);
+
+
+        // Appending the paragraph and personImage we created to the "gifDiv" div we created
+        gifDiv.append(p);
+        gifDiv.append(topicImage);
+
+        // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+        $("#images").prepend(gifDiv);
+
+    
+
+// a function
+        // When the user clicks one of the still GIPHY images, the gif should animate. 
+        // If the user clicks the gif again, it should stop playing.
+        $(topicImage).click(function(){
+            $(this).attr("src", results[x].images.fixed_height.url);
+        });
+        };
+
+    
+    });
+    });
+    
+
+
+
+// Add a form to your page takes the value from a user input box and adds it into your topics array. Then make a function call that takes each topic in the array remakes the buttons on the page.
+
+
+        //     // $(newButton).attr("data-topic", topics[i]);
+        // console.log(newButton.attr);
+        //     // Looping over every result item
+        //     for (var e = 0; e < results.length; e++) {
+  
+        //        // Creating a div for the gif
+        //         var gifDiv = $("<div>");
+  
+        //         // Creating an image tag
+        //         var topicImage = $("<img>");
+  
+        //         // Giving the image tag an src attribute of a proprty pulled off the
+        //         // result item
+        //         topicImage.attr("src", results[e].images.fixed_height.url);
+  
+        //         // Appending the topicImage we created to the "gifDiv" div we created
+
+        //         gifDiv.append(topicImage);
+  
+        //         // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+        //         $("#images").prepend(gifDiv);
+            //   };
+            // });
+        //   });
+
+
+
+</script>
+</body>
+</html>
