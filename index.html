@@ -51,13 +51,15 @@ var topics = [
 
     for (let i = 0; i < topics.length; i++){
             var newButton = $("<button>").append(topics[i]);
-            topics[i] = $(this).attr("data-topic");
-            // var topic = $(newButton).attr("src", topics[i]);
+            var topic = $(newButton).attr("src", topics[i]);
             $(".buttonContainer").append($(newButton));
+            console.log($(this));
         };
 
 // When the user clicks on a button, the page should grab 10 static, non-animated gif images from the GIPHY API and place them on the page.
 $("button").click(function(){
+    var topic = ($(this).attr("src"));
+    console.log(topic);
 
 //   Constructing a URL to search Giphy for the topic of the given button
     // for now, just displaying puppies gifs
@@ -124,38 +126,6 @@ $("button").click(function(){
     
     });
     });
-    
-
-
-
-// Add a form to your page takes the value from a user input box and adds it into your topics array. Then make a function call that takes each topic in the array remakes the buttons on the page.
-
-
-        //     // $(newButton).attr("data-topic", topics[i]);
-        // console.log(newButton.attr);
-        //     // Looping over every result item
-        //     for (var e = 0; e < results.length; e++) {
-  
-        //        // Creating a div for the gif
-        //         var gifDiv = $("<div>");
-  
-        //         // Creating an image tag
-        //         var topicImage = $("<img>");
-  
-        //         // Giving the image tag an src attribute of a proprty pulled off the
-        //         // result item
-        //         topicImage.attr("src", results[e].images.fixed_height.url);
-  
-        //         // Appending the topicImage we created to the "gifDiv" div we created
-
-        //         gifDiv.append(topicImage);
-  
-        //         // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
-        //         $("#images").prepend(gifDiv);
-            //   };
-            // });
-        //   });
-
 
 
 </script>
