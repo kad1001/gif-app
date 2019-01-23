@@ -24,6 +24,8 @@
         <!-- buttons will appear here -->
         <div class="buttonContainer">
         </div>
+        <!-- input box -->
+
         <!-- gifs will go here -->
         <div id="images"></div>
 
@@ -31,11 +33,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript">
-
-// global variables
-var topic;
-var newButton;
-
 var topics = [
             "puppies",
             "positive",
@@ -44,88 +41,96 @@ var topics = [
             "art",
             "bob ross",
             "happy",
-        ];    
+        ]; 
 
-    // Your app should take the topics in this array and create buttons in your HTML:
-    // Try using a loop that appends a button for each string in the array.
-
+function newButtons(){
+    $(".buttonContainer").empty();
+    // appends a button for each string in the array.
     for (let i = 0; i < topics.length; i++){
-            var newButton = $("<button>").append(topics[i]);
-            var topic = $(newButton).attr("src", topics[i]);
+            var newButton = $("<button>");
+            var topic = newButton.attr("src", topics[i]);
+            newButton.text(topics[i]);
+            // give each button a class
+            newButton.addClass("gif-button");
             $(".buttonContainer").append($(newButton));
             console.log($(this));
-        };
+        }
 
-// When the user clicks on a button, the page should grab 10 static, non-animated gif images from the GIPHY API and place them on the page.
-$("button").click(function(){
+    }
+    newButtons();
+
+
+
+
+// when a button is clicked, function re-renders the HTML to display the appropriate content
+$(".gif-button").click(function(){
+
     var topic = ($(this).attr("src"));
     console.log(topic);
-
-//   Constructing a URL to search Giphy for the topic of the given button
-    // for now, just displaying puppies gifs
     var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic + "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10";
 
-    //   Performing our AJAX GET request
+//   AJAX GET request for each button click
   $.ajax({
     url: queryURL,
     method: "GET"
   })
+  .then(function(response) {
+    //   determine which button was clicked
+    console.log($(this));
+    // Creating a div for the gif and assigning it a class of 'gif'
+    var gifDiv = $("<div class='gif'>");
+    // Storing an array of results in the results variable
+    var results = response.data;
 
-    // After the data comes back from the API
-    .then(function(response) {
-      // Storing an array of results in the results variable
-      var results = response.data;
+    // Adds a form that takes the value from a user input box and adds it into topics array
+    var input = $("<input>");
+    var submitBtn = $("<button>").attr("class", "submit");
+    $(input).attr("type", "text");
+    $(input).attr("class", "input");
+    // // append these to the button container in html
+    $(".buttonContainer").append(input);
+    $(".buttonContainer").append(submitBtn);
 
-      console.log(results);  
 
-    // looping through results 
-    // displaying paused images for each div
+    $(".submit").click(function(){
+    // // take the value of the input box and store it in inputVal
+        var inputVal = ($(".input").val().trim());
+        console.log(inputVal);
+        // add this input val to topics
+        topics.push(inputVal);
+        console.log(topics);
+
+    });
+    // looping through results -- displaying paused images for each div
     for (let x = 0; x < results.length; x++){
 
-        // Creating a div for the gif
-        var gifDiv = $("<div>");
-
-
-        // Under every gif, display its rating (PG, G, so on).
         // Storing the result item's rating
         var rating = results[x].rating;
-
         // Creating a paragraph tag with the result item's rating
         var p = $("<p>").text("Rating: " + rating);
-
         // Creating an image tag
         var topicImage = $("<img>");
-
-        // Giving the image tag an src attribute of a proprty pulled off the
-        // result item
         // this gives each of the topic images the source of the still image
-        $(topicImage).attr("src", results[x].images.fixed_height_still.url);
-
-        // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
-        var state = $(this).attr("data-state", "still");
-        console.log(state);
-
-
-        // Appending the paragraph and personImage we created to the "gifDiv" div we created
+        $(topicImage).attr("src", results[x].images.fixed_height_still.url);       
+        // Appending the paragraph and gif to gifDiv
         gifDiv.append(p);
         gifDiv.append(topicImage);
-
         // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
         $("#images").prepend(gifDiv);
-
-    
-
-// a function
         // When the user clicks one of the still GIPHY images, the gif should animate. 
         // If the user clicks the gif again, it should stop playing.
-        $(topicImage).click(function(){
-            $(this).attr("src", results[x].images.fixed_height.url);
-        });
-        };
+        $(this).attr("src", results[x].images.fixed_height.url);
+    };
 
-    
+
     });
+
     });
+
+
+    //  take the elements from "topics" global var array and create buttons for each
+        //   Adding a click event listener to all elements with a class of "movie-btn"
+        //   $(document).on("click", ".gif-button", displayGif());
 
 
 </script>
