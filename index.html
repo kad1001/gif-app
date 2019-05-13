@@ -1,138 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <!-- reset css -->
     <link rel="stylesheet" href="assets/reset.css">
-    <!-- style css -->
     <link rel="stylesheet" href="assets/style.css">
-    <!-- javascript -->
-    <!-- <script type="text/javascript" src="assets/game.js"></script> -->
 
     <!-- bootstrap -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" />
 
-    <title>Wholesome GIFs!</title>
+    <title>Giphy and Me</title>
 </head>
+
 <body>
-
-    
     <div class="container">
-        
         <!-- buttons will appear here -->
-        <div class="buttonContainer">
-        </div>
+        <div class="buttonContainer"></div>
         <!-- input box -->
-
+        <input id="search-input" type="text"></input>
+        <button type="submit" id="search-btn">Add</button>
         <!-- gifs will go here -->
-        <div id="images"></div>
+        <div id="images"> </div>
 
     </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script type="text/javascript">
-var topics = [
-            "puppies",
-            "positive",
-            "baby animals",
-            "inspiration",
-            "art",
-            "bob ross",
-            "happy",
-        ]; 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        var topics = [
+            "iguana",
+            "kardashian",
+            "dogs",
+            "coding",
+            "pizza"
+        ];
 
-function newButtons(){
-    $(".buttonContainer").empty();
-    // appends a button for each string in the array.
-    for (let i = 0; i < topics.length; i++){
-            var newButton = $("<button>");
-            var topic = newButton.attr("src", topics[i]);
-            newButton.text(topics[i]);
-            // give each button a class
-            newButton.addClass("gif-button");
-            $(".buttonContainer").append($(newButton));
-            console.log($(this));
+        var strung = JSON.stringify(topics);
+        console.log(strung);
+
+        function appendGifs(gifs) {
+            console.log(gifs);
+            var dataArray = (gifs.data);
+            for (let x = 0; x < dataArray.length; x++) {
+                var imageTemp = $("<img>");
+                var stillSrc = dataArray[x].images.fixed_height_still.url;
+                var motionSrc = dataArray[x].images.fixed_height.url;
+                $(imageTemp).attr("src", stillSrc);
+
+                $(imageTemp).attr("data-state", "still");
+
+                $("#images").prepend(imageTemp);
+                $(imageTemp).on("click", function (e) {
+                    var stillSrc = dataArray[x].images.fixed_height_still.url;
+                var motionSrc = dataArray[x].images.fixed_height.url;
+                    console.log(e.currentTarget.dataset.state)
+                    switch (e.currentTarget.dataset.state) {
+                        case "still":
+                            $(this).attr("src", motionSrc);
+                            $(this).attr("data-state", "motion")
+                            break;
+                        case "motion":
+                            $(this).attr("src", stillSrc);
+                            $(this).attr("data-state", "still")
+                            break;
+                    }
+                })
+            }
+
         }
 
-    }
-    newButtons();
+        function newButtons() {
+            for (let i = 0; i < topics.length; i++) {
+                var newButton = $("<button>");
+                console.log(strung)
+                var topic = newButton.attr("src", topic);
+                newButton.attr("class", topic);
+
+                newButton.text(topics[i]);
+                // give each button a class
+                $(newButton).attr("class", "button");
+                $(newButton).on("click", function (e) {
+                    var targ = ($(e).attr("target"));
+                    var innerTarg = targ.innerText;
+                    console.log(innerTarg);
+                    $.getJSON("https://api.giphy.com/v1/gifs/search?q=" + innerTarg +
+                        "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10",
+                        function (data, status) {
+                            appendGifs(data);
+                        });
+
+                })
+                $(".buttonContainer").append($(newButton));
+            }
+
+        };
 
 
-
-
-// when a button is clicked, function re-renders the HTML to display the appropriate content
-$(".gif-button").click(function(){
-
-    var topic = ($(this).attr("src"));
-    console.log(topic);
-    var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic + "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10";
-
-//   AJAX GET request for each button click
-  $.ajax({
-    url: queryURL,
-    method: "GET"
-  })
-  .then(function(response) {
-    //   determine which button was clicked
-    console.log($(this));
-    // Creating a div for the gif and assigning it a class of 'gif'
-    var gifDiv = $("<div class='gif'>");
-    // Storing an array of results in the results variable
-    var results = response.data;
-
-    // Adds a form that takes the value from a user input box and adds it into topics array
-    var input = $("<input>");
-    var submitBtn = $("<button>").attr("class", "submit");
-    $(input).attr("type", "text");
-    $(input).attr("class", "input");
-    // // append these to the button container in html
-    $(".buttonContainer").append(input);
-    $(".buttonContainer").append(submitBtn);
-
-
-    $(".submit").click(function(){
-    // // take the value of the input box and store it in inputVal
-        var inputVal = ($(".input").val().trim());
-        console.log(inputVal);
-        // add this input val to topics
-        topics.push(inputVal);
-        console.log(topics);
-
-    });
-    // looping through results -- displaying paused images for each div
-    for (let x = 0; x < results.length; x++){
-
-        // Storing the result item's rating
-        var rating = results[x].rating;
-        // Creating a paragraph tag with the result item's rating
-        var p = $("<p>").text("Rating: " + rating);
-        // Creating an image tag
-        var topicImage = $("<img>");
-        // this gives each of the topic images the source of the still image
-        $(topicImage).attr("src", results[x].images.fixed_height_still.url);       
-        // Appending the paragraph and gif to gifDiv
-        gifDiv.append(p);
-        gifDiv.append(topicImage);
-        // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
-        $("#images").prepend(gifDiv);
-        // When the user clicks one of the still GIPHY images, the gif should animate. 
-        // If the user clicks the gif again, it should stop playing.
-        $(this).attr("src", results[x].images.fixed_height.url);
-    };
-
-
-    });
-
-    });
-
-
-    //  take the elements from "topics" global var array and create buttons for each
-        //   Adding a click event listener to all elements with a class of "movie-btn"
-        //   $(document).on("click", ".gif-button", displayGif());
-
-
-</script>
+        $(window).on('load', function () {
+            newButtons();
+            $("#search-btn").on("click", function () {
+                var newSearch = $("#search-input").val().trim();
+                var newBtn = $("<button>");
+                console.log(newSearch);
+                $(newBtn).text(newSearch);
+                console.log(newBtn);
+                $(".buttonContainer").append(newBtn);
+                $(newBtn).on("click", function (e) {
+                    var targ = ($(e).attr("target"));
+                    var innerTarg = targ.innerText;
+                    console.log(innerTarg);
+                    $.getJSON("https://api.giphy.com/v1/gifs/search?q=" + innerTarg +
+                        "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10",
+                        function (data, status) {
+                            appendGifs(data);
+                        });
+                })
+            })
+        })
+    </script>
 </body>
+
 </html>
