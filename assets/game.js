@@ -1,80 +1,92 @@
-$("button").on("click", function() {
-    // In this case, the "this" keyword refers to the button that was clicked
-    var choice = $(this).attr("button-clicked");
+var topics = [
+  "iguana",
+  "music",
+  "dog",
+  "computer",
+  "pizza"
+];
 
-          // Constructing a URL to search Giphy for the name of the person who said the quote
-          var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
-          topic + "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10";
-  
-        // Performing our AJAX GET request
-        $.ajax({
-          url: queryURL,
-          method: "GET"
-        })
-          // After the data comes back from the API
-          .then(function(response) {
-            // Storing an array of results in the results variable
-            var results = response.data;
-            
-            var topics = [
-                "puppies",
-                "positive",
-                "baby animals",
-                "inspiration",
-                "art"
-            ];
-        
-            var topicButton = $("<button>");
-        
-        
-        
-        // Your app should take the topics in this array and create buttons in your HTML:
-            for (let i = 0; i < topics.length; i++){
-                var newButton = $(topicButton).append(topics[i]);
-                $(".buttonContainer").append(newButton(i));
-            };
-        
-            // // Looping over every result item
-            // for (var i = 0; i < results.length; i++) {
-  
-            //    // Creating a div for the gif
-            //     var gifDiv = $("<div>");
-  
-            //     // Creating an image tag
-            //     var topicImage = $("<img>");
-  
-            //     // Giving the image tag an src attribute of a proprty pulled off the
-            //     // result item
-            //     topicImage.attr("src", results[i].images.fixed_height.url);
-  
-            //     // Appending the paragraph and personImage we created to the "gifDiv" div we created
-            //     gifDiv.append(p);
-            //     gifDiv.append(personImage);
-  
-            //     // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
-            //     $("#gifs-appear-here").prepend(gifDiv);
-            //   }
-            // }
-          });
+var strung = JSON.stringify(topics);
 
+function appendGifs(gifs) {
+  var dataArray = (gifs.data);
 
+  for (let x = 0; x < dataArray.length; x++) {
+    var imageTemp = $("<img>");
+    var stillSrc = dataArray[x].images.fixed_height_still.url;
+    $(imageTemp).attr("src", stillSrc);
+    $(imageTemp).attr("data-state", "still");
 
+    $("#images").prepend(imageTemp);
 
+    $(imageTemp).on("click", function (e) {
+      var stillSrc = dataArray[x].images.fixed_height_still.url;
+      var motionSrc = dataArray[x].images.fixed_height.url;
+      console.log(e.currentTarget.dataset.state)
 
+      switch (e.currentTarget.dataset.state) {
+        case "still":
+          $(this).attr("src", motionSrc);
+          $(this).attr("data-state", "motion")
+          break;
+        case "motion":
+          $(this).attr("src", stillSrc);
+          $(this).attr("data-state", "still")
+          break;
+      }
+    })
+  }
 
+}
 
+function newButtons() {
+  for (let i = 0; i < topics.length; i++) {
+    var newButton = $("<button>");
 
-// Try using a loop that appends a button for each string in the array.
+    var topic = newButton.attr("src", topic);
+    newButton.attr("class", topic);
+    newButton.text(topics[i]);
+    $(newButton).attr("class", "button");
 
+    $(newButton).on("click", function (e) {
+      $("#images").empty();
 
-// When the user clicks on a button, the page should grab 10 static, non-animated gif images from the GIPHY API and place them on the page.
-// When the user clicks one of the still GIPHY images, the gif should animate. If the user clicks the gif again, it should stop playing.
+      var targ = ($(e).attr("target"));
+      var innerTarg = targ.innerText;
 
-// Under every gif, display its rating (PG, G, so on).
+      $.getJSON("https://api.giphy.com/v1/gifs/search?q=" + innerTarg +
+        "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10",
+        function (data, status) {
+          appendGifs(data);
+        });
+
+    });
+
+    $(".buttonContainer").append($(newButton));
+  }
+};
 
 
-// This data is provided by the GIPHY API.
-// Only once you get images displaying with button presses should you move on to the next step.
+$(window).on('load', function () {
+  newButtons();
 
+  $("#search-btn").on("click", function () {
+    var newSearch = $("#search-input").val().trim();
+    var newBtn = $("<button>");
 
-// Add a form to your page takes the value from a user input box and adds it into your topics array. Then make a function call that takes each topic in the array remakes the buttons on the page.
+    $(newBtn).text(newSearch);
+    $(".buttonContainer").append(newBtn);
+
+    $(newBtn).on("click", function (e) {
+
+      var targ = ($(e).attr("target"));
+      var innerTarg = targ.innerText;
+
+      $.getJSON("https://api.giphy.com/v1/gifs/search?q=" + innerTarg +
+        "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10",
+        function (data, status) {
+          appendGifs(data);
+        });
+    })
+  })
+})

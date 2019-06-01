@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="assets/reset.css">
     <link rel="stylesheet" href="assets/style.css">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
     <!-- bootstrap -->
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" />
@@ -28,99 +30,12 @@
 
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script type="text/javascript">
-        var topics = [
-            "iguana",
-            "kardashian",
-            "dogs",
-            "coding",
-            "pizza"
-        ];
-
-        var strung = JSON.stringify(topics);
-        console.log(strung);
-
-        function appendGifs(gifs) {
-            console.log(gifs);
-            var dataArray = (gifs.data);
-            for (let x = 0; x < dataArray.length; x++) {
-                var imageTemp = $("<img>");
-                var stillSrc = dataArray[x].images.fixed_height_still.url;
-                var motionSrc = dataArray[x].images.fixed_height.url;
-                $(imageTemp).attr("src", stillSrc);
-
-                $(imageTemp).attr("data-state", "still");
-
-                $("#images").prepend(imageTemp);
-                $(imageTemp).on("click", function (e) {
-                    var stillSrc = dataArray[x].images.fixed_height_still.url;
-                var motionSrc = dataArray[x].images.fixed_height.url;
-                    console.log(e.currentTarget.dataset.state)
-                    switch (e.currentTarget.dataset.state) {
-                        case "still":
-                            $(this).attr("src", motionSrc);
-                            $(this).attr("data-state", "motion")
-                            break;
-                        case "motion":
-                            $(this).attr("src", stillSrc);
-                            $(this).attr("data-state", "still")
-                            break;
-                    }
-                })
-            }
-
-        }
-
-        function newButtons() {
-            for (let i = 0; i < topics.length; i++) {
-                var newButton = $("<button>");
-                console.log(strung)
-                var topic = newButton.attr("src", topic);
-                newButton.attr("class", topic);
-
-                newButton.text(topics[i]);
-                // give each button a class
-                $(newButton).attr("class", "button");
-                $(newButton).on("click", function (e) {
-                    var targ = ($(e).attr("target"));
-                    var innerTarg = targ.innerText;
-                    console.log(innerTarg);
-                    $.getJSON("https://api.giphy.com/v1/gifs/search?q=" + innerTarg +
-                        "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10",
-                        function (data, status) {
-                            appendGifs(data);
-                        });
-
-                })
-                $(".buttonContainer").append($(newButton));
-            }
-
-        };
+    <!-- Your welcome -->
+    <script type="text/javascript" src="./assets/game.js"></script>
+    
 
 
-        $(window).on('load', function () {
-            newButtons();
-            $("#search-btn").on("click", function () {
-                var newSearch = $("#search-input").val().trim();
-                var newBtn = $("<button>");
-                console.log(newSearch);
-                $(newBtn).text(newSearch);
-                console.log(newBtn);
-                $(".buttonContainer").append(newBtn);
-                $(newBtn).on("click", function (e) {
-                    var targ = ($(e).attr("target"));
-                    var innerTarg = targ.innerText;
-                    console.log(innerTarg);
-                    $.getJSON("https://api.giphy.com/v1/gifs/search?q=" + innerTarg +
-                        "&api_key=EPcjsGxa1IuaDljdOa1MHNorY3F8zAgB&limit=10",
-                        function (data, status) {
-                            appendGifs(data);
-                        });
-                })
-            })
-        })
-    </script>
+
 </body>
 
 </html>
